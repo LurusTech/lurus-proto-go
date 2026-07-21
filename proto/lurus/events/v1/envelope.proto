@@ -1,0 +1,60 @@
+syntax = "proto3";
+
+package lurus.events.v1;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/hanmahong5-arch/lurus-proto-go/events/v1;eventsv1";
+
+// EventEnvelope is the single wire format for every event on the lurus event
+// backbone (one append-only authoritative log, N independently materialized
+// read views). The payload is an opaque serialized protobuf message whose
+// concrete type is named by event_type.
+message EventEnvelope {
+  // ULID (26-char Crockford base32, monotonic within an emitter). Doubles as
+  // the JetStream Nats-Msg-Id dedup key.
+  string event_id = 1;
+
+  // NSID-style event type, e.g. "cn.lurus.tally.stock.received". A type name
+  // is never reused with different semantics: a semantic change is a NEW type
+  // (see SCHEMA_RULES.md).
+  string event_type = 2;
+
+  // Version of the payload schema for this event_type. Starts at 1; bumped
+  // only on additive payload changes.
+  uint32 schema_ver = 3;
+
+  // Owning tenant. Empty only for platform-global events.
+  string tenant_id = 4;
+
+  // Who caused the event.
+  Actor actor = 5;
+
+  // Business time: when the fact became true (not when it was published).
+  google.protobuf.Timestamp occurred_at = 6;
+
+  // Serialized payload message of the type named by event_type / schema_ver.
+  bytes payload = 7;
+
+  // Lowercase hex SHA-256 of the previous envelope's canonical bytes on the
+  // same subject; "" for the first event. Forms a per-subject hash chain for
+  // tamper evidence (see ADR 003 in eventkit).
+  string prev_hash = 8;
+
+  // W3C trace id for cross-service correlation. Optional.
+  string trace_id = 9;
+}
+
+// Actor identifies the principal that caused an event.
+message Actor {
+  ActorType type = 1;
+  // User id, service name, or job name depending on type.
+  string id = 2;
+}
+
+enum ActorType {
+  ACTOR_TYPE_UNSPECIFIED = 0;
+  ACTOR_TYPE_USER = 1;
+  ACTOR_TYPE_SERVICE = 2;
+  ACTOR_TYPE_SYSTEM = 3;
+}

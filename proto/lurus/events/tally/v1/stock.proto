@@ -1,0 +1,71 @@
+syntax = "proto3";
+
+package lurus.events.tally.v1;
+
+option go_package = "github.com/hanmahong5-arch/lurus-proto-go/events/tally/v1;tallyeventsv1";
+
+// Tally (2b-svc-tally, 进销存 PSI) stock domain events.
+//
+// event_type mapping:
+//   cn.lurus.tally.stock.received     -> StockReceived
+//   cn.lurus.tally.stock.issued      -> StockIssued
+//   cn.lurus.tally.stock.transferred -> StockTransferred
+//   cn.lurus.tally.stock.counted     -> StockCounted
+//   cn.lurus.tally.stock.written_off -> StockWrittenOff
+//
+// Quantities are int64 in the SKU's smallest stock-keeping unit (integral).
+// Fractional units (斤/两 style) are deliberately out of scope for schema_ver 1
+// and will arrive as a new schema_ver with an explicit decimal representation.
+// Money is int64 fen, aligned with the platform ledger convention.
+
+// StockReceived: goods entered a warehouse (采购入库/退货入库).
+message StockReceived {
+  string sku_id = 1;
+  string warehouse_id = 2;
+  // Must be > 0.
+  int64 quantity = 3;
+  // Unit cost in fen; 0 when unknown at receipt time.
+  int64 unit_cost_fen = 4;
+  // Source business document (入库单/采购单) id.
+  string ref_doc_id = 5;
+}
+
+// StockIssued: goods left a warehouse (销售出库/领用出库).
+message StockIssued {
+  string sku_id = 1;
+  string warehouse_id = 2;
+  // Must be > 0; the view subtracts it.
+  int64 quantity = 3;
+  string ref_doc_id = 4;
+}
+
+// StockTransferred: goods moved between two warehouses of the same tenant.
+message StockTransferred {
+  string sku_id = 1;
+  string from_warehouse_id = 2;
+  string to_warehouse_id = 3;
+  // Must be > 0.
+  int64 quantity = 4;
+  string ref_doc_id = 5;
+}
+
+// StockCounted: a physical count fixed the absolute on-hand quantity
+// (盘点). Views MUST treat this as an absolute set, not a delta.
+message StockCounted {
+  string sku_id = 1;
+  string warehouse_id = 2;
+  // Absolute on-hand quantity observed by the count; >= 0.
+  int64 counted_quantity = 3;
+  string ref_doc_id = 4;
+}
+
+// StockWrittenOff: stock removed from books (报损/报废).
+message StockWrittenOff {
+  string sku_id = 1;
+  string warehouse_id = 2;
+  // Must be > 0; the view subtracts it.
+  int64 quantity = 3;
+  // Human-entered reason (报损原因).
+  string reason = 4;
+  string ref_doc_id = 5;
+}

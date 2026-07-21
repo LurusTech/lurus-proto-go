@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package lurus.events.v1;
+
+import "google/protobuf/descriptor.proto";
+
+option go_package = "github.com/hanmahong5-arch/lurus-proto-go/events/v1;eventsv1";
+
+extend google.protobuf.FieldOptions {
+  // Marks a payload field as personal data (PII).
+  //
+  // Every PII field in an event payload MUST carry this option (see
+  // SCHEMA_RULES.md). Reserved for future crypto-shredding: PII fields will be
+  // encrypted with a per-tenant key so that deleting the key erases the data
+  // across the otherwise immutable event log.
+  bool pii = 50100;
+}

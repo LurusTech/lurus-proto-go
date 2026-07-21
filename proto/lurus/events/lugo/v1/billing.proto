@@ -1,0 +1,70 @@
+syntax = "proto3";
+
+package lurus.events.lugo.v1;
+
+option go_package = "github.com/hanmahong5-arch/lurus-proto-go/events/lugo/v1;lugoeventsv1";
+
+// Lugo (2l-svc-platform) billing domain events — SCHEMA ONLY.
+//
+// No funds logic is implemented against these types in eventkit. Field
+// semantics deliberately align with the platform ledger abstraction
+// (2l-svc-platform/internal/billing/ledger): 128-bit application-generated
+// TransferRef as the idempotency key, money as int64 fen, and the explicit
+// quota-vs-credits ledger split. The authoritative funds path stays in the
+// platform ledger (PG / TigerBeetle); these events are its emitted facts,
+// never its input.
+//
+// event_type mapping:
+//   cn.lurus.lugo.billing.charged        -> BillingCharged
+//   cn.lurus.lugo.billing.refunded       -> BillingRefunded
+//   cn.lurus.lugo.billing.quota_deducted -> QuotaDeducted
+
+// TransferRef mirrors the platform ledger's 128-bit application-generated
+// transfer id. Replaying an event with a TransferRef the ledger has already
+// applied is a no-op there (StatusExists), which is what makes these events
+// safe to re-consume.
+message TransferRef {
+  uint64 hi = 1;
+  uint64 lo = 2;
+}
+
+enum LedgerKind {
+  LEDGER_KIND_UNSPECIFIED = 0;
+  // Token-quota ledger (platform ledger Kind 1).
+  LEDGER_KIND_QUOTA = 1;
+  // Cash-wallet mirror ledger, unit = fen (platform ledger Kind 2).
+  LEDGER_KIND_CREDITS = 2;
+}
+
+// BillingCharged: a wallet was charged for a product order.
+message BillingCharged {
+  TransferRef transfer_id = 1;
+  string wallet_id = 2;
+  // Must be > 0. Fen for LEDGER_KIND_CREDITS; tokens for LEDGER_KIND_QUOTA.
+  int64 amount = 3;
+  LedgerKind ledger = 4;
+  string product_code = 5;
+  string order_id = 6;
+}
+
+// BillingRefunded: a previous charge was (partially) reversed.
+message BillingRefunded {
+  TransferRef transfer_id = 1;
+  string wallet_id = 2;
+  // Must be > 0; same unit rules as BillingCharged.
+  int64 amount = 3;
+  LedgerKind ledger = 4;
+  // The order whose charge is being reversed.
+  string original_order_id = 5;
+  string reason = 6;
+}
+
+// QuotaDeducted: metered usage consumed token quota (hot path fact).
+message QuotaDeducted {
+  TransferRef transfer_id = 1;
+  string wallet_id = 2;
+  // Tokens deducted; must be > 0.
+  int64 amount = 3;
+  // Usage record / request id that caused the deduction.
+  string ref_id = 4;
+}

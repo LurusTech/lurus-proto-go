@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+package lurus.events.sync.v1;
+
+import "lurus/events/v1/annotations.proto";
+
+option go_package = "github.com/hanmahong5-arch/lurus-proto-go/events/sync/v1;synceventsv1";
+
+// Multi-device sync domain events (四端同步地基).
+//
+// event_type mapping:
+//   cn.lurus.sync.device_registered -> DeviceRegistered
+//   cn.lurus.sync.cursor_advanced   -> CursorAdvanced
+
+// DeviceRegistered: a client device joined a tenant's sync scope.
+message DeviceRegistered {
+  string device_id = 1;
+  // OS platform: "windows" | "macos" | "linux" | "android" | "ios" | "web".
+  string platform = 2;
+  string app_version = 3;
+  // User-visible device name (e.g. "张三的 iPhone") — routinely contains a
+  // person's name, hence PII.
+  string device_name = 4 [(lurus.events.v1.pii) = true];
+}
+
+// CursorAdvanced: a device acknowledged everything up to a stream sequence.
+// Emitted by the sync gateway, consumed by presence/cleanup views. This is a
+// fact about consumption progress, NOT the projector-internal cursor (which
+// lives in JetStream durable consumer state).
+message CursorAdvanced {
+  string device_id = 1;
+  // The logical stream whose cursor moved, e.g. "TALLY_EVENTS".
+  string stream = 2;
+  // Last fully-applied JetStream stream sequence.
+  uint64 cursor_seq = 3;
+}
