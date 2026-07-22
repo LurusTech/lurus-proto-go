@@ -20,9 +20,16 @@ jobs:
       - name: Lint
         run: buf lint
 
+      # PR checkouts have no local 'main' ref, hence origin/main. Skip while
+      # main has no .proto files yet (buf hard-fails on an empty module).
       - name: Breaking (against main)
         if: github.event_name == 'pull_request'
-        run: buf breaking --against '.git#branch=main'
+        run: |
+          if git ls-tree -r origin/main --name-only | grep -q '\.proto$'; then
+            buf breaking --against '.git#branch=origin/main'
+          else
+            echo "main has no .proto files yet; skipping breaking check"
+          fi
 
       - uses: actions/setup-go@v5
         with:
