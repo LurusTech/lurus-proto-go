@@ -1,8 +1,10 @@
 # SCHEMA_RULES — lurus 事件契约演进铁律
 
 > 适用范围:`proto/lurus/events/**` 全部事件类型与 `EventEnvelope`。
-> 执法工具:`buf lint`(STANDARD)+ `buf breaking`(FILE,CI 对 main 跑)。
-> 工具挡不住的语义规则(下表 R3/R5/R6)靠 code review 执行,违例 = 拒合。
+> 执法工具:`buf lint`(STANDARD)+ `buf breaking`(FILE,CI 对 main 跑)
+> + `events/schema_test.go`(机器强制 R5/R6/R7/R8 与 Registry↔descriptor 双向一致,
+> `go test ./events/` 即执法;新增事件类型三处齐改:.proto、`events/registry.go`、本表)。
+> 仅 R3/R4(语义判断)靠 code review 执行,违例 = 拒合。
 
 ## 规则
 
