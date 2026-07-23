@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package lurus.events.lugo.v1;
 
+import "lurus/events/v1/annotations.proto";
+
 option go_package = "github.com/hanmahong5-arch/lurus-proto-go/events/lugo/v1;lugoeventsv1";
 
 // Lugo (2l-svc-platform) billing domain events — SCHEMA ONLY.
@@ -56,7 +58,9 @@ message BillingRefunded {
   LedgerKind ledger = 4;
   // The order whose charge is being reversed.
   string original_order_id = 5;
-  string reason = 6;
+  // Human-entered refund reason — free text can carry person names, hence
+  // PII (SCHEMA_RULES R5).
+  string reason = 6 [(lurus.events.v1.pii) = true];
 }
 
 // QuotaDeducted: metered usage consumed token quota (hot path fact).

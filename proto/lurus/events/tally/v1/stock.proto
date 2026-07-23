@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package lurus.events.tally.v1;
 
+import "lurus/events/v1/annotations.proto";
+
 option go_package = "github.com/hanmahong5-arch/lurus-proto-go/events/tally/v1;tallyeventsv1";
 
 // Tally (2b-svc-tally, 进销存 PSI) stock domain events.
@@ -65,7 +67,8 @@ message StockWrittenOff {
   string warehouse_id = 2;
   // Must be > 0; the view subtracts it.
   int64 quantity = 3;
-  // Human-entered reason (报损原因).
-  string reason = 4;
+  // Human-entered reason (报损原因) — free text can carry person names,
+  // hence PII (SCHEMA_RULES R5).
+  string reason = 4 [(lurus.events.v1.pii) = true];
   string ref_doc_id = 5;
 }

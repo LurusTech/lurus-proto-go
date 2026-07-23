@@ -7,6 +7,7 @@
 package tallyeventsv1
 
 import (
+	_ "github.com/hanmahong5-arch/lurus-proto-go/events/v1"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -327,7 +328,8 @@ type StockWrittenOff struct {
 	WarehouseId string                 `protobuf:"bytes,2,opt,name=warehouse_id,json=warehouseId,proto3" json:"warehouse_id,omitempty"`
 	// Must be > 0; the view subtracts it.
 	Quantity int64 `protobuf:"varint,3,opt,name=quantity,proto3" json:"quantity,omitempty"`
-	// Human-entered reason (报损原因).
+	// Human-entered reason (报损原因) — free text can carry person names,
+	// hence PII (SCHEMA_RULES R5).
 	Reason        string `protobuf:"bytes,4,opt,name=reason,proto3" json:"reason,omitempty"`
 	RefDocId      string `protobuf:"bytes,5,opt,name=ref_doc_id,json=refDocId,proto3" json:"ref_doc_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -403,7 +405,7 @@ var File_lurus_events_tally_v1_stock_proto protoreflect.FileDescriptor
 
 const file_lurus_events_tally_v1_stock_proto_rawDesc = "" +
 	"\n" +
-	"!lurus/events/tally/v1/stock.proto\x12\x15lurus.events.tally.v1\"\xa7\x01\n" +
+	"!lurus/events/tally/v1/stock.proto\x12\x15lurus.events.tally.v1\x1a!lurus/events/v1/annotations.proto\"\xa7\x01\n" +
 	"\rStockReceived\x12\x15\n" +
 	"\x06sku_id\x18\x01 \x01(\tR\x05skuId\x12!\n" +
 	"\fwarehouse_id\x18\x02 \x01(\tR\vwarehouseId\x12\x1a\n" +
@@ -429,12 +431,12 @@ const file_lurus_events_tally_v1_stock_proto_rawDesc = "" +
 	"\fwarehouse_id\x18\x02 \x01(\tR\vwarehouseId\x12)\n" +
 	"\x10counted_quantity\x18\x03 \x01(\x03R\x0fcountedQuantity\x12\x1c\n" +
 	"\n" +
-	"ref_doc_id\x18\x04 \x01(\tR\brefDocId\"\x9d\x01\n" +
+	"ref_doc_id\x18\x04 \x01(\tR\brefDocId\"\xa3\x01\n" +
 	"\x0fStockWrittenOff\x12\x15\n" +
 	"\x06sku_id\x18\x01 \x01(\tR\x05skuId\x12!\n" +
 	"\fwarehouse_id\x18\x02 \x01(\tR\vwarehouseId\x12\x1a\n" +
-	"\bquantity\x18\x03 \x01(\x03R\bquantity\x12\x16\n" +
-	"\x06reason\x18\x04 \x01(\tR\x06reason\x12\x1c\n" +
+	"\bquantity\x18\x03 \x01(\x03R\bquantity\x12\x1c\n" +
+	"\x06reason\x18\x04 \x01(\tB\x04\xa0\xbb\x18\x01R\x06reason\x12\x1c\n" +
 	"\n" +
 	"ref_doc_id\x18\x05 \x01(\tR\brefDocIdBIZGgithub.com/hanmahong5-arch/lurus-proto-go/events/tally/v1;tallyeventsv1b\x06proto3"
 

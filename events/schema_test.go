@@ -128,9 +128,14 @@ func TestR7DomainBudget(t *testing.T) {
 }
 
 func TestR5PIIFieldsAreTagged(t *testing.T) {
+	// Direct identifiers plus free-text carriers: R5 explicitly counts
+	// 用户输入的自由文本 as PII, and human-typed reasons/notes routinely
+	// contain person names.
 	piiTokens := map[string]bool{
 		"name": true, "email": true, "phone": true, "mobile": true,
 		"address": true, "passport": true, "birthday": true,
+		"reason": true, "note": true, "remark": true, "description": true,
+		"comment": true, "memo": true, "text": true,
 	}
 	// Full field names allowed untagged despite matching a token (justify each).
 	exempt := map[protoreflect.FullName]bool{}

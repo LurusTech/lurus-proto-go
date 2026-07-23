@@ -7,6 +7,7 @@
 package lugoeventsv1
 
 import (
+	_ "github.com/hanmahong5-arch/lurus-proto-go/events/v1"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -224,9 +225,11 @@ type BillingRefunded struct {
 	Ledger LedgerKind `protobuf:"varint,4,opt,name=ledger,proto3,enum=lurus.events.lugo.v1.LedgerKind" json:"ledger,omitempty"`
 	// The order whose charge is being reversed.
 	OriginalOrderId string `protobuf:"bytes,5,opt,name=original_order_id,json=originalOrderId,proto3" json:"original_order_id,omitempty"`
-	Reason          string `protobuf:"bytes,6,opt,name=reason,proto3" json:"reason,omitempty"`
-	unknownFields   protoimpl.UnknownFields
-	sizeCache       protoimpl.SizeCache
+	// Human-entered refund reason — free text can carry person names, hence
+	// PII (SCHEMA_RULES R5).
+	Reason        string `protobuf:"bytes,6,opt,name=reason,proto3" json:"reason,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *BillingRefunded) Reset() {
@@ -376,7 +379,7 @@ var File_lurus_events_lugo_v1_billing_proto protoreflect.FileDescriptor
 
 const file_lurus_events_lugo_v1_billing_proto_rawDesc = "" +
 	"\n" +
-	"\"lurus/events/lugo/v1/billing.proto\x12\x14lurus.events.lugo.v1\"-\n" +
+	"\"lurus/events/lugo/v1/billing.proto\x12\x14lurus.events.lugo.v1\x1a!lurus/events/v1/annotations.proto\"-\n" +
 	"\vTransferRef\x12\x0e\n" +
 	"\x02hi\x18\x01 \x01(\x04R\x02hi\x12\x0e\n" +
 	"\x02lo\x18\x02 \x01(\x04R\x02lo\"\x81\x02\n" +
@@ -387,15 +390,15 @@ const file_lurus_events_lugo_v1_billing_proto_rawDesc = "" +
 	"\x06amount\x18\x03 \x01(\x03R\x06amount\x128\n" +
 	"\x06ledger\x18\x04 \x01(\x0e2 .lurus.events.lugo.v1.LedgerKindR\x06ledger\x12!\n" +
 	"\fproduct_code\x18\x05 \x01(\tR\vproductCode\x12\x19\n" +
-	"\border_id\x18\x06 \x01(\tR\aorderId\"\x88\x02\n" +
+	"\border_id\x18\x06 \x01(\tR\aorderId\"\x8e\x02\n" +
 	"\x0fBillingRefunded\x12B\n" +
 	"\vtransfer_id\x18\x01 \x01(\v2!.lurus.events.lugo.v1.TransferRefR\n" +
 	"transferId\x12\x1b\n" +
 	"\twallet_id\x18\x02 \x01(\tR\bwalletId\x12\x16\n" +
 	"\x06amount\x18\x03 \x01(\x03R\x06amount\x128\n" +
 	"\x06ledger\x18\x04 \x01(\x0e2 .lurus.events.lugo.v1.LedgerKindR\x06ledger\x12*\n" +
-	"\x11original_order_id\x18\x05 \x01(\tR\x0foriginalOrderId\x12\x16\n" +
-	"\x06reason\x18\x06 \x01(\tR\x06reason\"\x9f\x01\n" +
+	"\x11original_order_id\x18\x05 \x01(\tR\x0foriginalOrderId\x12\x1c\n" +
+	"\x06reason\x18\x06 \x01(\tB\x04\xa0\xbb\x18\x01R\x06reason\"\x9f\x01\n" +
 	"\rQuotaDeducted\x12B\n" +
 	"\vtransfer_id\x18\x01 \x01(\v2!.lurus.events.lugo.v1.TransferRefR\n" +
 	"transferId\x12\x1b\n" +

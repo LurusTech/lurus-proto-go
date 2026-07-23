@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+package lurus.events.v1;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/hanmahong5-arch/lurus-proto-go/events/v1;eventsv1";
+
+// DeadLetter is the pointer record a projector publishes when an event
+// exhausts its retries or cannot be decoded. It REFERENCES the event in the
+// authoritative log — never copies it: the log keeps the only original, and
+// re-drive tooling resolves (stream, stream_seq) back to the wire bytes.
+//
+// This is infrastructure, not a business event: it is not in the event-type
+// registry and carries no EventEnvelope. It still lives here (not as ad-hoc
+// JSON) so DLQ consumers in any language get the same buf-governed,
+// breaking-change-protected contract as everything else on the backbone.
+message DeadLetter {
+  // Stream holding the dead event.
+  string stream = 1;
+  // The dead event's authoritative stream sequence.
+  uint64 stream_seq = 2;
+  // Subject the event was published on.
+  string subject = 3;
+  // Durable consumer (projector) that gave up.
+  string durable = 4;
+  // Envelope event_id; empty when the envelope was undecodable.
+  string event_id = 5;
+  // Envelope event_type; "<undecodable>" for poison bytes.
+  string event_type = 6;
+  // Why it was dead-lettered: "exhausted" or "poison".
+  string cause = 7;
+  // Last apply/unmarshal error, for humans.
+  string error = 8;
+  // Delivery attempts consumed before giving up.
+  uint64 num_delivered = 9;
+  // When the pointer was written.
+  google.protobuf.Timestamp dead_lettered_at = 10;
+}
