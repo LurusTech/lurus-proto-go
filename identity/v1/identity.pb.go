@@ -13,9 +13,10 @@ import (
 
 // Account represents a unified Lurus user identity.
 type Account struct {
-	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	LurusId       string                 `protobuf:"bytes,2,opt,name=lurus_id,json=lurusId,proto3" json:"lurus_id,omitempty"`
-	ZitadelSub    string                 `protobuf:"bytes,3,opt,name=zitadel_sub,json=zitadelSub,proto3" json:"zitadel_sub,omitempty"`
+	Id      int64  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	LurusId string `protobuf:"bytes,2,opt,name=lurus_id,json=lurusId,proto3" json:"lurus_id,omitempty"`
+	// Deprecated: 使用 idp_subject(platform canonical)。物理列 zitadel_sub 待 owner-gated migration 改名。
+	ZitadelSub string `protobuf:"bytes,3,opt,name=zitadel_sub,json=zitadelSub,proto3" json:"zitadel_sub,omitempty"`
 	DisplayName   string                 `protobuf:"bytes,4,opt,name=display_name,json=displayName,proto3" json:"display_name,omitempty"`
 	AvatarUrl     string                 `protobuf:"bytes,5,opt,name=avatar_url,json=avatarUrl,proto3" json:"avatar_url,omitempty"`
 	Email         string                 `protobuf:"bytes,6,opt,name=email,proto3" json:"email,omitempty"`
@@ -29,12 +30,15 @@ type Account struct {
 	UpdatedAt     *timestamppb.Timestamp `protobuf:"bytes,14,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
 }
 
+// Deprecated: 使用 idp_subject(platform canonical)。此 RPC 保留向后兼容，新调用方改用 UpsertAccount + idp_subject 查询路径。
 type GetAccountByZitadelSubRequest struct {
+	// Deprecated: 使用 idp_subject(platform canonical)。
 	ZitadelSub string `protobuf:"bytes,1,opt,name=zitadel_sub,json=zitadelSub,proto3" json:"zitadel_sub,omitempty"`
 }
 
 type UpsertAccountRequest struct {
-	ZitadelSub      string `protobuf:"bytes,1,opt,name=zitadel_sub,json=zitadelSub,proto3" json:"zitadel_sub,omitempty"`
+	// Deprecated: 使用 idp_subject(platform canonical)。此字段对应物理列 zitadel_sub，改名待 owner-gated migration。
+	ZitadelSub string `protobuf:"bytes,1,opt,name=zitadel_sub,json=zitadelSub,proto3" json:"zitadel_sub,omitempty"`
 	Email           string `protobuf:"bytes,2,opt,name=email,proto3" json:"email,omitempty"`
 	DisplayName     string `protobuf:"bytes,3,opt,name=display_name,json=displayName,proto3" json:"display_name,omitempty"`
 	AvatarUrl       string `protobuf:"bytes,4,opt,name=avatar_url,json=avatarUrl,proto3" json:"avatar_url,omitempty"`

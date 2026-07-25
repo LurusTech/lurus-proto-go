@@ -17,6 +17,7 @@ import (
 
 // IdentityServiceClient is the client API for IdentityService.
 type IdentityServiceClient interface {
+	// Deprecated: 使用 idp_subject(platform canonical)。此 RPC 保留向后兼容，新调用方迁移至基于 idp_subject 的查询路径。
 	GetAccountByZitadelSub(ctx context.Context, in *GetAccountByZitadelSubRequest, opts ...grpc.CallOption) (*Account, error)
 	UpsertAccount(ctx context.Context, in *UpsertAccountRequest, opts ...grpc.CallOption) (*Account, error)
 	GetEntitlements(ctx context.Context, in *GetEntitlementsRequest, opts ...grpc.CallOption) (*GetEntitlementsResponse, error)
@@ -102,6 +103,7 @@ func (c *identityServiceClient) WalletReleasePreAuth(ctx context.Context, in *Wa
 
 // IdentityServiceServer is the server API for IdentityService.
 type IdentityServiceServer interface {
+	// Deprecated: 使用 idp_subject(platform canonical)。此 RPC 保留向后兼容，新实现迁移至基于 idp_subject 的查询路径。
 	GetAccountByZitadelSub(context.Context, *GetAccountByZitadelSubRequest) (*Account, error)
 	UpsertAccount(context.Context, *UpsertAccountRequest) (*Account, error)
 	GetEntitlements(context.Context, *GetEntitlementsRequest) (*GetEntitlementsResponse, error)
@@ -118,6 +120,7 @@ type IdentityServiceServer interface {
 // UnimplementedIdentityServiceServer should be embedded to have forward compatible implementations.
 type UnimplementedIdentityServiceServer struct{}
 
+// Deprecated: 使用 idp_subject(platform canonical)。
 func (UnimplementedIdentityServiceServer) GetAccountByZitadelSub(context.Context, *GetAccountByZitadelSubRequest) (*Account, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAccountByZitadelSub not implemented")
 }
